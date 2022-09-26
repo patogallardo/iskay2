@@ -21,7 +21,10 @@ def write_paramfile():
             "SORTBY": 'lum',
             "OMEGA_M": 0.315,
             "LITTLE_H": 0.6731,
-            "ESTIMATOR_NAME": 'ferreira99'}
+            "ESTIMATOR_NAME": 'ferreira99',
+            
+            "N_BOOTSTRAP_ITERATIONS": 100
+            }
     fname_out = os.path.join(os.getcwd(), "params.json")
     with open(fname_out, 'w') as f:
         json.dump(data, f, indent=4)

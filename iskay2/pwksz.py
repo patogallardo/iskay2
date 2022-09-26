@@ -117,6 +117,7 @@ def pw_compute_ksz(df, params, rc):
     
     kszcurve = compute_curve(df_pw, params)
     df_pw['ksz_curve'] = kszcurve
+    df_pw['r_mp'] = s/params['LITTLE_H']
     return df_pw
 
 
