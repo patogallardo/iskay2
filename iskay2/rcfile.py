@@ -14,6 +14,7 @@ def write_default_rcfile():
             "NPROC_AP_PHOTO": 45,
             "NPROC_PAIRWISE":20,
             "RANDOM_SEED":0,
+            "VERBOSE": True
             }
     fname_out = os.path.join(str(Path.home()), ".iskay2rc")
 

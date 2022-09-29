@@ -3,6 +3,7 @@ import numpy as np
 from . import tzav
 import os
 import pandas as pd
+import time
 
 RECIPES_NUM_DEN = {'ferreira99': {'num': ['cdT'], 'den': ['c2']}}
 
@@ -25,16 +26,19 @@ def pw_ksz(df, params, rc):
     ra_deg = df.ra.values
     dec_deg = df.dec.values
     d_mpc_over_h = df["d_mpc_over_h"].values
+    dtype = ra_deg.dtype
     
     ap_photo_sel_string = "dT_%1.2f_arcmin" % params["R_DISK_ARCMIN_PAIRWISEKSZ"]
     dT = df[ap_photo_sel_string].values
-    r_bins_mpc_over_h = np.array(params["R_BINS_MPC"]) * params["LITTLE_H"]
+    r_bins_mpc_over_h = (np.array(params["R_BINS_MPC"]) * params["LITTLE_H"]).astype(dtype)
     
     autocorr = 1
     cosmology = 2
     nthreads = 2 # this should come from rc
     mumax = 1.0
     mubins = 1
+    isa='avx512f'
+    verbose=False
     is_comoving_dist = True
     
     if params["REDSHIFT_CORRECTION"]:
@@ -49,14 +53,14 @@ def pw_ksz(df, params, rc):
                       weights1=dT_ksz,
                       weight_type = 'cdT',
                       is_comoving_dist=is_comoving_dist,
-                      c_api_timer=False)
+                      c_api_timer=False, isa=isa, verbose=True)
     res2 = DDsmu_mocks(autocorr, cosmology, nthreads,
                      mumax, mubins, r_bins_mpc_over_h,
                      ra_deg, dec_deg, d_mpc_over_h,
                      weights1=dT_ksz,
                      weight_type='c2',
                      is_comoving_dist=is_comoving_dist,
-                     c_api_timer=False)
+                     c_api_timer=False, isa=isa)
     npairs = res1['npairs']
     s = 0.5 * (res1['smin'] + res2['smax'])
     pksz = res1['weightavg']/res2['weightavg']
@@ -67,13 +71,16 @@ def pw_compute_ksz(df, params, rc):
     '''Computes the sums specified in the
     recipe.
     '''
+    if rc['VERBOSE']:
+        t1 = time.time()
     ra_deg = df.ra.values
     dec_deg = df.dec.values
     d_mpc_over_h = df['d_mpc_over_h'].values
+    dtype = ra_deg.dtype
 
     ap_photo_sel_string = "dT_%1.2f_arcmin" % params["R_DISK_ARCMIN_PAIRWISEKSZ"]
     dT = df[ap_photo_sel_string].values
-    r_bins_mpc_over_h = np.array(params["R_BINS_MPC"]) * params["LITTLE_H"]
+    r_bins_mpc_over_h = (np.array(params["R_BINS_MPC"]) * params["LITTLE_H"]).astype(dtype)
 
     # params for corrfunc
     autocorr = 1
@@ -85,6 +92,8 @@ def pw_compute_ksz(df, params, rc):
     mumax = 1.0
     mubins = 1
     is_comoving_dist = True
+    isa = "avx512f" # fastest
+    verbose=False
     # end params for corrfunc
     
     if params["REDSHIFT_CORRECTION"]:
@@ -102,7 +111,9 @@ def pw_compute_ksz(df, params, rc):
                           weights1=dT_ksz,
                           weight_type = weight_type,
                           is_comoving_dist=is_comoving_dist,
-                          c_api_timer=False)
+                          verbose=verbose,
+                          c_api_timer=False,
+                          isa=isa)
         sums.append(res['weightavg'])
     npairs = res['npairs']
     sums.append(npairs)
@@ -118,6 +129,9 @@ def pw_compute_ksz(df, params, rc):
     kszcurve = compute_curve(df_pw, params)
     df_pw['ksz_curve'] = kszcurve
     df_pw['r_mp'] = s/params['LITTLE_H']
+    if rc['VERBOSE']:
+        t2 = time.time()
+        print("BS time: %1.2f" %(t2-t1))
     return df_pw
 
 

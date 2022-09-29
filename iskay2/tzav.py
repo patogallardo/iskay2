@@ -53,4 +53,6 @@ def correct_dT_tzav(dT, z, sigma_z):
     '''
     tzav = get_tzav_fast(dT, z, sigma_z)
     dT_ksz = dT - tzav
+    if dT_ksz.dtype != dT.dtype:
+        dT_ksz = dT_ksz.astype(dT.dtype)
     return dT_ksz
