@@ -37,7 +37,7 @@ def pw_ksz(df, params, rc):
     nthreads = 2 # this should come from rc
     mumax = 1.0
     mubins = 1
-    isa='avx512f'
+    isa='fastest'
     verbose=False
     is_comoving_dist = True
     
@@ -93,7 +93,7 @@ def pw_compute_ksz(df, params, rc):
     mubins = 1
     is_comoving_dist = True
     isa = "avx512f" # fastest
-    verbose=False
+    verbose = rc["VERBOSE"]
     # end params for corrfunc
     
     if params["REDSHIFT_CORRECTION"]:
