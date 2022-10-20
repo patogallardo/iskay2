@@ -19,13 +19,13 @@ def get_tzav_and_w_nb(dT, z, zj, sigma_z, res1, res2):
         res2 += mt.exp(-(zj[0]-z[i])**2/(2.0*sigma_z[0]**2))
 
 
-def get_tzav_fast(dTs, zs, sigma_z):
+def get_tzav_fast(dTs, zs, sigma_z, N_samples_in_sigmaz=4,
+                  interp_kind='linear'):
     '''Subsample and interpolate Tzav to make it fast.
     dTs: entire list of dT decrements
     zs: entire list of redshifts
     sigma_z: width of the gaussian kernel we want to apply.
     '''
-    N_samples_in_sigmaz = 15  # in one width of sigmaz use Nsamples
     zmin, zmax = zs.min(), zs.max()
     delta_z = zmax - zmin
 
@@ -39,7 +39,7 @@ def get_tzav_fast(dTs, zs, sigma_z):
     get_tzav_and_w_nb(dTs, zs, z_subsampled, sigma_z, res1, res2)
     tzav_subsampled = res1/res2
     #interpolate
-    f = interpolate.interp1d(z_subsampled, tzav_subsampled, kind='cubic')
+    f = interpolate.interp1d(z_subsampled, tzav_subsampled, kind=interp_kind)
     tzav_fast = f(zs)
     return tzav_fast
 
@@ -53,4 +53,6 @@ def correct_dT_tzav(dT, z, sigma_z):
     '''
     tzav = get_tzav_fast(dT, z, sigma_z)
     dT_ksz = dT - tzav
+    if dT_ksz.dtype != dT.dtype:
+        dT_ksz = dT_ksz.astype(dT.dtype)
     return dT_ksz

@@ -15,6 +15,7 @@ def write_default_rcfile():
             "NPROC_AP_PHOTO": cpu_count(),
             "NPROC_PAIRWISE":cpu_count(),
             "RANDOM_SEED":0,
+            "VERBOSE": True
             }
     fname_out = os.path.join(str(Path.home()), ".iskay2rc")
 
