@@ -9,6 +9,10 @@ def load_map(params, rc=None, noisemap=False):
         fname = params["DIVMAP_FNAME"]
     else:
         fname = params["MAP_FNAME"]
+
+    if fname == "None":
+        return None
+
     print("Loading map: %s" % fname)
     if rcfile is None:
         rc = rcfile.load_rcfile()
