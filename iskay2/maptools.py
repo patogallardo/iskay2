@@ -2,10 +2,13 @@ from pixell import enmap
 from os.path import join
 from . import rcfile
 
-def load_map(params, rc=None):
+def load_map(params, rc=None, noisemap=False):
     '''Opens map in fname.
     Uses default directory in rc file.'''
-    fname = params["MAP_FNAME"]
+    if noisemap:
+        fname = params["DIVMAP_FNAME"]
+    else:
+        fname = params["MAP_FNAME"]
     print("Loading map: %s" % fname)
     if rcfile is None:
         rc = rcfile.load_rcfile()

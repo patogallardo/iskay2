@@ -70,7 +70,8 @@ def get_ap_photo_full_cat(ras_deg, decs_deg,
                           r_rad_submap=np.deg2rad(10./60.),
                           oversample=2,
                           r_ring_over_r_disk=np.sqrt(2),
-                          Nproc=2):
+                          Nproc=2,
+                          noisemap=False):
     '''Receives a list of ra, dec in degrees, the map and
     a list of radii for the disks and ratios of disk and ring.
     ras, decs_deg: ra, dec in degrees
@@ -102,10 +103,18 @@ def get_ap_photo_full_cat(ras_deg, decs_deg,
     dTs = T_disks - T_rings
 
     r_rings_arcmin = r_disks_arcmin * R_RING_OVER_R_DISK
-    titles_disks = ["T_disk_%1.2f_arcmin" % r for r in r_disks_arcmin]
-    titles_rings = ["T_ring_%1.2f_arcmin" % r for r in r_disks_arcmin]
-    titles_dTs = ["dT_%1.2f_arcmin" % r for r in r_disks_arcmin]
-    
+
+    if noisemap:
+        prefix = "noise"
+    else:
+        prefix = ""
+    titles_disks = [prefix + "T_disk_%1.2f_arcmin" % r for r in r_disks_arcmin]
+    titles_rings = [prefix + "T_ring_%1.2f_arcmin" % r for r in r_disks_arcmin]
+    titles_dTs = [prefix + "dT_%1.2f_arcmin" % r for r in r_disks_arcmin]
+    if noisemap:
+        T_disks = 1/np.sqrt(T_disks)
+        T_rings = 1/np.sqrt(T_rings)
+        dTs = np.zeros(len(T_disks))
     vals = np.hstack([T_disks, T_rings, dTs])
     df = pd.DataFrame(vals,
                columns=titles_disks + titles_rings + titles_dTs)

@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 from iskay2 import tile_tools
 import healpy as hp
 import numpy as np
@@ -19,8 +20,8 @@ res_el = hp.nside2resol(NSIDE, arcmin=True) / 60
 
 df = pd.read_hdf('./ApPhotoResults/ap_photo.hdf')
 
-df = tiled_JK.classify_grid(df, Nside=NSIDE)
-hist = tiled_JK.healpix_histogram_catalog(df, NSIDE)
+df = tile_tools.classify_grid(df, Nside=NSIDE)
+hist = tile_tools.healpix_histogram_catalog(df, NSIDE)
 number_of_nonzero_pixs = np.sum(hist > 0)
 
 area_el = res_el**2
@@ -32,7 +33,7 @@ print("covered_area is: %1.2f sq deg" % (cat_area))
 DIRNAME = './cat_plots'
 if not os.path.exists(DIRNAME):
     os.mkdir(DIRNAME)
-plot_fname = os.path.join(DIRNAME, params.NAME)
+plot_fname = os.path.join(DIRNAME, params['NAME'])
 
 hp.mollview(hist)
 plt.title("Area: %1.2f sq. deg" % cat_area)
