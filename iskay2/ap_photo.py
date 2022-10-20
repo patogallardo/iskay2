@@ -122,11 +122,11 @@ def get_ap_photo_full_cat(ras_deg, decs_deg,
     return df
 
 
-def save_ap_photo(df_cat, df_ap_photo):
+def save_ap_photo(df_cat, df_ap_photo, df_noise):
     if not os.path.exists("./ApPhotoResults"):
         os.mkdir("ApPhotoResults")
     df_ap_photo.index = df_cat.index
-    df = pd.concat([df_cat, df_ap_photo],
+    df = pd.concat([df_cat, df_ap_photo, df_noise],
                    axis='columns')
     df.to_hdf("ApPhotoResults/ap_photo.hdf",
               key='df_ap_photo',
@@ -134,6 +134,7 @@ def save_ap_photo(df_cat, df_ap_photo):
 
 
 def get_ap_photo_in_catalog_and_save(df_cat, themap,
+    themap_noise,
     params, rc):
     '''Computes ap_photo for all rows in df_cat. Needs to
     suppply themap and, rc and params files.
@@ -160,6 +161,13 @@ def get_ap_photo_in_catalog_and_save(df_cat, themap,
                     oversample=oversample,
                     r_ring_over_r_disk=r_ring_over_r_disk,
                     Nproc=Nproc)
+    df_noise = get_ap_photo_full_cat(ras_deg, decs_deg,
+                                     themap_noise,
+                                     r_disks_arcmin,
+                    r_rad_submap=r_rad_submap,
+                    oversample=oversample,
+                    r_ring_over_r_disk=r_ring_over_r_disk,
+                    Nproc=Nproc)
     # define cosmology and compute distances
     z = df_cat.z.values
     c = cosmology.cosmo(Omega_m = omega_m, Little_h = little_h)
@@ -168,4 +176,4 @@ def get_ap_photo_in_catalog_and_save(df_cat, themap,
     # end cosmology distance calculation
     df_cat['d_mpc'] = d_mpc
     df_cat['d_mpc_over_h'] = d_mpc_over_h
-    save_ap_photo(df_cat, df_ap_photo)
+    save_ap_photo(df_cat, df_ap_photo, df_noise)
