@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 import os
 import numpy as np
+from multiprocessing import cpu_count
 
 def write_default_rcfile():
     data = {
@@ -11,8 +12,8 @@ def write_default_rcfile():
             "OVERSAMPLE":2,
             "R_ARCMIN_SUBMAP":10,
             "R_RAD_SUBMAP":np.deg2rad(10./60),
-            "NPROC_AP_PHOTO": 45,
-            "NPROC_PAIRWISE":20,
+            "NPROC_AP_PHOTO": cpu_count(),
+            "NPROC_PAIRWISE":cpu_count(),
             "RANDOM_SEED":0,
             }
     fname_out = os.path.join(str(Path.home()), ".iskay2rc")
