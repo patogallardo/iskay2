@@ -114,7 +114,7 @@ def get_ap_photo_full_cat(ras_deg, decs_deg,
     if noisemap:
         T_disks = 1/np.sqrt(T_disks)
         T_rings = 1/np.sqrt(T_rings)
-        dTs = np.zeros(len(T_disks))
+        dTs = dTs * 0.0
     vals = np.hstack([T_disks, T_rings, dTs])
     df = pd.DataFrame(vals,
                columns=titles_disks + titles_rings + titles_dTs)
