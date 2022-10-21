@@ -167,7 +167,8 @@ def get_ap_photo_in_catalog_and_save(df_cat, themap,
                     r_rad_submap=r_rad_submap,
                     oversample=oversample,
                     r_ring_over_r_disk=r_ring_over_r_disk,
-                    Nproc=Nproc)
+                    Nproc=Nproc,
+                    noisemap=True)
     # define cosmology and compute distances
     z = df_cat.z.values
     c = cosmology.cosmo(Omega_m = omega_m, Little_h = little_h)
