@@ -105,12 +105,12 @@ def get_ap_photo_full_cat(ras_deg, decs_deg,
     r_rings_arcmin = r_disks_arcmin * R_RING_OVER_R_DISK
 
     if noisemap:
-        prefix = "noise"
+        prefix = "noise_"
     else:
         prefix = ""
-    titles_disks = [prefix + "T_disk_%1.2f_arcmin".replace('.', 'p') % r for r in r_disks_arcmin]
-    titles_rings = [prefix + "T_ring_%1.2f_arcmin".replace('.', 'p') % r for r in r_disks_arcmin]
-    titles_dTs = [prefix + "dT_%1.2f_arcmin".replace('.', 'p') % r for r in r_disks_arcmin]
+    titles_disks = [prefix + ("T_disk_%1.2f_arcmin" % r).replace('.', 'p') for r in r_disks_arcmin]
+    titles_rings = [prefix + ("T_ring_%1.2f_arcmin" % r).replace('.', 'p') for r in r_disks_arcmin]
+    titles_dTs = [prefix + ("dT_%1.2f_arcmin" % r).replace('.', 'p') for r in r_disks_arcmin]
     if noisemap:
         T_disks = 1/np.sqrt(T_disks)
         T_rings = 1/np.sqrt(T_rings)
