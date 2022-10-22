@@ -28,7 +28,7 @@ def pw_ksz(df, params, rc):
     d_mpc_over_h = df["d_mpc_over_h"].values
     dtype = ra_deg.dtype
     
-    ap_photo_sel_string = "dT_%1.2f_arcmin" % params["R_DISK_ARCMIN_PAIRWISEKSZ"]
+    ap_photo_sel_string = "dT_%1.2f_arcmin" % params["R_DISK_ARCMIN_PAIRWISEKSZ"].replace('.', 'p')
     dT = df[ap_photo_sel_string].values
     r_bins_mpc_over_h = (np.array(params["R_BINS_MPC"]) * params["LITTLE_H"]).astype(dtype)
     
@@ -78,7 +78,7 @@ def pw_compute_ksz(df, params, rc):
     d_mpc_over_h = df['d_mpc_over_h'].values
     dtype = ra_deg.dtype
 
-    ap_photo_sel_string = "dT_%1.2f_arcmin" % params["R_DISK_ARCMIN_PAIRWISEKSZ"]
+    ap_photo_sel_string = ("dT_%1.2f_arcmin" % params["R_DISK_ARCMIN_PAIRWISEKSZ"]).replace('.', 'p')
     dT = df[ap_photo_sel_string].values
     r_bins_mpc_over_h = (np.array(params["R_BINS_MPC"]) * params["LITTLE_H"]).astype(dtype)
 

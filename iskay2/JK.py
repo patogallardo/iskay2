@@ -7,7 +7,7 @@ def get_bs(df, params, rc):
     '''Compute bootstrap iterating on 
     random catalogs.'''
     Nit = params['N_BOOTSTRAP_ITERATIONS']
-    ap_photo_sel_string = "dT_%1.2f_arcmin" % params["R_DISK_ARCMIN_PAIRWISEKSZ"]
+    ap_photo_sel_string = ("dT_%1.2f_arcmin" % params["R_DISK_ARCMIN_PAIRWISEKSZ"]).replace('.', 'p')
     df_pws = []
     
     df_bs = df.copy()
@@ -37,7 +37,10 @@ class BS:
         cov = np.cov(curves.T)
         corr = np.corrcoef(curves.T)
         
-        self.ksz_curve_full_dataset = df_pw_full_dataset
+        self.r_mp = df_pw_full_dataset.r_mp.values
+        self.r_mp_over_h = df_pw_full_dataset.r_mp_over_h.values
+        self.ksz_curve_full_dataset = df_pw_full_dataset.ksz_curve.values
+        self.ksz_curve_full_dataset_object = df_pw_full_dataset
         self.curves = curves
         self.df_pws = df_pws
         self.ksz_curves = curves

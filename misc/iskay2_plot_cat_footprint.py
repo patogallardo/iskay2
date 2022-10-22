@@ -8,7 +8,7 @@ import sys
 import os
 from iskay2.paramfile import load_paramfile
 
-show = False
+show = True
 param_fname = sys.argv[1]
 NSIDE = 64
 params = load_paramfile(fname=param_fname)
@@ -19,6 +19,7 @@ res_el = hp.nside2resol(NSIDE, arcmin=True) / 60
 
 
 df = pd.read_hdf('./ApPhotoResults/ap_photo.hdf')
+df = df.query(params['QUERY'])
 
 df = tile_tools.classify_grid(df, Nside=NSIDE)
 hist = tile_tools.healpix_histogram_catalog(df, NSIDE)
