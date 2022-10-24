@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 from iskay2 import paramfile
 from iskay2 import maptools
 from iskay2 import rcfile
@@ -12,7 +13,7 @@ the_noise_map = maptools.load_map(params,
                                   rc=rc,
                                   noisemap=True)
 df = catalogtools.load_catalog(params, rc=rc)
-#df = df.head(1000)
+df = df.head(1000)
 
 ap_photo.get_ap_photo_in_catalog_and_save(df,
                                           themap,

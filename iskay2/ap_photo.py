@@ -79,7 +79,10 @@ def get_ap_photo_full_cat(ras_deg, decs_deg,
     r_disks_arcmin: list of r_disks in arcmin
     R_RING_OVER_R_DISK: ratio of r ring over r disk.
     '''
-    r_disks_arcmin = np.array(r_disks_arcmin)
+    if noisemap:
+        r_disks_arcmin = np.array([3.0])
+    else:
+        r_disks_arcmin = np.array(r_disks_arcmin)
     global themap # use this to use themap within get_ap_photo_in_one_coordinate
     global R_RAD_SUBMAP
     global OVERSAMPLE
@@ -105,18 +108,20 @@ def get_ap_photo_full_cat(ras_deg, decs_deg,
     r_rings_arcmin = r_disks_arcmin * R_RING_OVER_R_DISK
 
     if noisemap:
-        prefix = "noise_"
+        titles_disks = ['noise']
     else:
-        prefix = ""
-    titles_disks = [prefix + ("T_disk_%1.2f_arcmin" % r).replace('.', 'p') for r in r_disks_arcmin]
-    titles_rings = [prefix + ("T_ring_%1.2f_arcmin" % r).replace('.', 'p') for r in r_disks_arcmin]
-    titles_dTs = [prefix + ("dT_%1.2f_arcmin" % r).replace('.', 'p') for r in r_disks_arcmin]
+        titles_disks = [("T_disk_%1.2f_arcmin" % r).replace('.', 'p') for r in r_disks_arcmin]
+        titles_rings = [("T_ring_%1.2f_arcmin" % r).replace('.', 'p') for r in r_disks_arcmin]
+        titles_dTs = [("dT_%1.2f_arcmin" % r).replace('.', 'p') for r in r_disks_arcmin]
+
     if noisemap:
         T_disks = 1/np.sqrt(T_disks)
-        T_rings = 1/np.sqrt(T_rings)
-        dTs = dTs * 0.0
-    vals = np.hstack([T_disks, T_rings, dTs])
-    df = pd.DataFrame(vals,
+        vals = np.hstack([T_disks])
+        df = pd.DataFrame(vals,
+                          columns=titles_disks)
+    else:
+        vals = np.hstack([T_disks, T_rings, dTs])
+        df = pd.DataFrame(vals,
                columns=titles_disks + titles_rings + titles_dTs)
 
     return df
