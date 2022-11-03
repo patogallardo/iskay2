@@ -22,3 +22,13 @@ def load_map(params, rc=None, noisemap=False):
     if themap.shape[0] == 3:
         themap = themap[0]
     return themap
+
+
+def load_mask(fname, rc):
+    print("Loading mask: %s" %fname)
+    map_path = rc['MAPS_PATH']
+    map_path = join(map_path, fname)
+    themap = enmap.read_fits(map_path)
+    if themap.shape[0] == 3:
+        themap = themap[0]
+    return themap

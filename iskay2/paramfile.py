@@ -16,6 +16,13 @@ def write_paramfile():
             "MAP_FNAME": "act_planck_s08_s18_cmb_f150_night_map.fits",
             "DIVMAP_FNAME": "act_planck_s08_s18_cmb_f150_night_ivar.fits",
             "CAT_FNAME": "V20_DR15_Catalog.csv",
+            "MASK0_FNAME": "act_mask_20220316_GAL020_rms_70.00_downgrade_None.fits",
+            "MASK1_FNAME": "act_mask_20220316_GAL040_rms_70.00_downgrade_None.fits",
+            "MASK2_FNAME": "act_mask_20220316_GAL060_rms_70.00_downgrade_None.fits",
+            "MASK3_FNAME": "srcfind_mask_f150.fits",
+            "MASK4_FNAME": "None",
+            "MASK5_FNAME": "None",
+            "MASKED_RADIUS_ARCMIN": 3.0,
             "QUERY": 'lum > 7.962650518080777e10 and S18coadd == True',
             "NGAL": 1000000,
             "SORTBY": 'lum',
@@ -28,6 +35,17 @@ def write_paramfile():
     fname_out = os.path.join(os.getcwd(), "params.json")
     with open(fname_out, 'w') as f:
         json.dump(data, f, indent=4)
+
+
+def get_mask_fnames(params):
+    fnames = []
+    names = []
+    for j in range(5):
+        tag = "MASK%i_FNAME" % j
+        if ".fits" in params[tag]:
+            fnames.append(params[tag])
+            names.append(tag.split("_")[0])
+    return fnames, names
 
 
 def load_paramfile(fname='params.json'):

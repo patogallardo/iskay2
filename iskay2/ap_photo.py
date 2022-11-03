@@ -12,6 +12,8 @@ from multiprocessing import cpu_count
 from itertools import repeat
 import pandas as pd
 from . import cosmology
+from . import paramfile
+from . import maptools
 import os
 
 
@@ -62,6 +64,65 @@ def get_ap_photo_in_one_coordinate(r_disks_arcmin_decra_rad):
     #R_RING_OVER_R_DISK has to exist in a higher scope.
     return ap_photo_res
 
+
+def get_submap_native_pix(themap, decra_rad, R_RAD_SUBMAP):
+    '''Receives themap, dec_ra in radians and a semiwidth.
+    returns a square pixel
+    '''
+    dec_rad, ra_rad = decra_rad
+    box = np.array([[dec_rad - R_RAD_SUBMAP, ra_rad - R_RAD_SUBMAP],
+                    [dec_rad + R_RAD_SUBMAP, ra_rad + R_RAD_SUBMAP]])
+    submap = themap.submap(box)
+    return submap
+
+
+def is_submap_masked(r_disk_arcmin, submap):
+    '''Check if submap has True values within r_disk_arcmin'''
+    r_arcmin_map = np.rad2deg(submap.modrmap()) * 60
+    sel_disk = r_arcmin_map < r_disk_arcmin
+    is_true = np.any(submap[sel_disk]==False) # if any is zero, where False is do not use
+    return is_true
+
+
+def get_mask_status_in_one_coordinate(r_disk_arcmin_decra_rad):
+    '''needs a global variable called themap
+    '''
+    r_disk_arcmin, decra_rad = r_disk_arcmin_decra_rad
+    submap = get_submap_native_pix(themap, decra_rad, R_RAD_SUBMAP)
+    is_masked = is_submap_masked(r_disk_arcmin, submap)
+    return is_masked
+
+
+def get_ap_mask_full_cat(ras_deg, decs_deg,
+                         the_map, r_disk_arcmin,
+                         r_rad_submap=np.deg2rad(10./60.),
+                         Nproc=2,
+                         mask_name="masked"): 
+    '''Determines if galaxies are masked for the full catalog.
+    Identical params than get_ap_photo_full_cat
+    '''
+    global themap
+    global R_RAD_SUBMAP
+    themap = the_map
+    R_RAD_SUBMAP = r_rad_submap
+    ras_rad = np.deg2rad(ras_deg)
+    decs_rad = np.deg2rad(decs_deg)
+    coords_decs_ras_rad = np.vstack([decs_rad, ras_rad]).T
+
+    args = zip(repeat(r_disk_arcmin), coords_decs_ras_rad)
+    
+    with Pool(processes=Nproc) as pool:
+        res = pool.map(get_mask_status_in_one_coordinate, args)
+    masked = np.array(res)
+
+    vals = np.hstack([masked])
+    title = [mask_name]
+    df = pd.DataFrame(vals,
+                      columns=title)
+    return df
+
+
+   
 
 def get_ap_photo_full_cat(ras_deg, decs_deg,
                           the_map,
@@ -127,18 +188,33 @@ def get_ap_photo_full_cat(ras_deg, decs_deg,
     return df
 
 
-def save_ap_photo(df_cat, df_ap_photo, df_noise):
+def save_ap_photo(df_res):
     if not os.path.exists("./ApPhotoResults"):
         os.mkdir("ApPhotoResults")
-    df_ap_photo.index = df_cat.index
-    df = pd.concat([df_cat, df_ap_photo, df_noise],
-                   axis='columns')
-    df.to_hdf("ApPhotoResults/ap_photo.hdf",
-              key='df_ap_photo',
-              mode='w')
+    df_res.to_hdf("ApPhotoResults/ap_photo.hdf",
+                  key='df_ap_photo',
+                  mode='w')
 
 
-def get_ap_photo_in_catalog_and_save(df_cat, themap,
+def get_mask_tags(df_cat, params, rc):
+    mask_fnames, mask_names = paramfile.get_mask_fnames(params)
+    ras_deg, decs_deg = df_cat.ra.values, df_cat.dec.values
+    r_disk_arcmin = params["MASKED_RADIUS_ARCMIN"]
+    Nproc = rc["NPROC_AP_PHOTO"]
+    dfs = []
+    for j, fname in enumerate(mask_fnames):
+        the_mask = maptools.load_mask(fname, rc)
+        df_out = get_ap_mask_full_cat(ras_deg, decs_deg,
+                         the_mask, r_disk_arcmin,
+                         r_rad_submap=rc["R_RAD_SUBMAP"],
+                         Nproc=Nproc,
+                         mask_name=mask_names[j])
+        dfs.append(df_out)
+    dfs = pd.concat(dfs, axis='columns')
+    return dfs
+
+
+def get_ap_photo_in_catalog(df_cat, themap,
     themap_noise,
     params, rc):
     '''Computes ap_photo for all rows in df_cat. Needs to
@@ -182,4 +258,6 @@ def get_ap_photo_in_catalog_and_save(df_cat, themap,
     # end cosmology distance calculation
     df_cat['d_mpc'] = d_mpc
     df_cat['d_mpc_over_h'] = d_mpc_over_h
-    save_ap_photo(df_cat, df_ap_photo, df_noise)
+    df_res = pd.concat([df_cat, df_ap_photo, df_noise],
+                       axis='columns')
+    return df_res
