@@ -4,7 +4,7 @@ import numpy as np
 
 def write_paramfile():
     '''Write a default param file in current directory.'''
-    data = {"NAME": "DR5_150GHz",
+    data = {"NAME": "DR6_150GHz",
             "R_BINS_MPC":[0.01, 10, 20, 30, 40, 50, 60, 70, 80,
                           90, 100, 110, 120, 130, 140, 150, 200,
                           250, 315, 395],
@@ -13,9 +13,9 @@ def write_paramfile():
             "R_DISK_ARCMIN_PAIRWISEKSZ": 2.1,
             "R_DISKS_ARCMIN": [2.1, 2.5, 3.0],
             "R_RING_OVER_R_DISK": np.sqrt(2.0),
-            "MAP_FNAME": "act_planck_s08_s18_cmb_f150_night_map.fits",
-            "DIVMAP_FNAME": "act_planck_s08_s18_cmb_f150_night_ivar.fits",
-            "CAT_FNAME": "V20_DR15_Catalog.csv",
+            "MAP_FNAME": "20211219_act_planck_night_f150_map.fits",
+            "DIVMAP_FNAME": "20211219_act_planck_night_f150_ivar.fits",
+            "CAT_FNAME": "V20_DR15_Catalog_v3.csv",
             "MASK0_FNAME": "act_mask_20220316_GAL020_rms_70.00_downgrade_None.fits",
             "MASK1_FNAME": "act_mask_20220316_GAL040_rms_70.00_downgrade_None.fits",
             "MASK2_FNAME": "act_mask_20220316_GAL060_rms_70.00_downgrade_None.fits",
