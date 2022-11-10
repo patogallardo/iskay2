@@ -2,6 +2,7 @@ from iskay2 import pwksz
 import progressbar
 import pandas as pd
 import numpy as np
+import os
 
 def get_bs(df, params, rc):
     '''Compute bootstrap iterating on 
@@ -26,7 +27,7 @@ def get_bs(df, params, rc):
 
 
 class BS:
-    def __init__(self, df, params, rc):
+    def __init__(self, df, params, rc, save=False):
         df_pw_full_dataset = pwksz.pw_compute_ksz(df, params, rc)
         df_pws = get_bs(df, params, rc)
         curves = np.array([df['ksz_curve'].values
@@ -48,3 +49,20 @@ class BS:
         self.errorbar_percentiles = errorbar_percentiles
         self.cov = cov
         self.corr = corr
+
+        if save:
+            SAVEDIR = "./results/"
+            if not os.path.exists(SAVEDIR):
+                os.mkdir(SAVEDIR)
+            df_pw_full_dataset.to_hdf(os.path.join(SAVEDIR, params["NAME"] + '.hdf'),
+                                      key='df_curve')
+
+            labels = ["%i" % val for val in  np.round(df_pw_full_dataset.r_mp.values, 0)]
+
+            df_corr = pd.DataFrame(corr, index=labels, columns=labels)
+            df_corr.to_hdf(os.path.join(SAVEDIR, params['NAME'] + '.hdf'),
+                           key='df_corr')
+
+            df_cov = pd.DataFrame(cov, index=labels, columns=labels)
+            df_cov.to_hdf(os.path.join(SAVEDIR, params["NAME"] + '.hdf'),
+                          key='df_cov')
