@@ -141,7 +141,7 @@ def get_ap_photo_full_cat(ras_deg, decs_deg,
     R_RING_OVER_R_DISK: ratio of r ring over r disk.
     '''
     if noisemap:
-        r_disks_arcmin = np.array([3.0])
+        r_disks_arcmin = np.array([2.1])
     else:
         r_disks_arcmin = np.array(r_disks_arcmin)
     global themap # use this to use themap within get_ap_photo_in_one_coordinate

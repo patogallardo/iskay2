@@ -3,6 +3,7 @@ import progressbar
 import pandas as pd
 import numpy as np
 import os
+import time
 
 def get_bs(df, params, rc):
     '''Compute bootstrap iterating on 
@@ -29,7 +30,9 @@ def get_bs(df, params, rc):
 class BS:
     def __init__(self, df, params, rc, save=False):
         df_pw_full_dataset = pwksz.pw_compute_ksz(df, params, rc)
+        t1 = time.time()
         df_pws = get_bs(df, params, rc)
+        t2 = time.time()
         curves = np.array([df['ksz_curve'].values
                           for df in df_pws])
         errorbar_std = curves.std(axis=0)
@@ -54,15 +57,26 @@ class BS:
             SAVEDIR = "./results/"
             if not os.path.exists(SAVEDIR):
                 os.mkdir(SAVEDIR)
-            df_pw_full_dataset.to_hdf(os.path.join(SAVEDIR, params["NAME"] + '.hdf'),
-                                      key='df_curve')
+            hdf_out_fname = os.path.join(SAVEDIR, params["NAME"] + '.hdf')
+            df_curve_err = pd.DataFrame({'r_mp': df_pw_full_dataset.r_mp.values ,
+                                         'ksz_curve': df_pw_full_dataset.ksz_curve,
+                                         'errorbar': errorbar_std})
+            df_curve_err.to_hdf(hdf_out_fname, key='df_ksz_err')
+
+            df_pw_full_dataset.to_hdf(hdf_out_fname,
+                                      key='df_pw')
 
             labels = ["%i" % val for val in  np.round(df_pw_full_dataset.r_mp.values, 0)]
 
             df_corr = pd.DataFrame(corr, index=labels, columns=labels)
-            df_corr.to_hdf(os.path.join(SAVEDIR, params['NAME'] + '.hdf'),
+            df_corr.to_hdf(hdf_out_fname,
                            key='df_corr')
 
             df_cov = pd.DataFrame(cov, index=labels, columns=labels)
-            df_cov.to_hdf(os.path.join(SAVEDIR, params["NAME"] + '.hdf'),
+            df_cov.to_hdf(hdf_out_fname,
                           key='df_cov')
+            s = pd.Series({'Ngal': len(df), 
+                           'runtime': t2-t1,
+           'N_BOOTSTRAP_ITERATIONS': params["N_BOOTSTRAP_ITERATIONS"]})
+            s.to_hdf(hdf_out_fname, 
+                     key='s_additional')
