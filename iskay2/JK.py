@@ -5,7 +5,7 @@ import numpy as np
 import os
 import time
 
-def get_bs(df, params, rc):
+def get_bs(df, params, rc, seed=1):
     '''Compute bootstrap iterating on 
     random catalogs.'''
     Nit = params['N_BOOTSTRAP_ITERATIONS']
@@ -15,6 +15,7 @@ def get_bs(df, params, rc):
     df_bs = df.copy()
     dTs = df_bs[ap_photo_sel_string].values
     Nel = len(df)
+    np.random.seed(seed)
     for j in progressbar.progressbar(range(Nit)):
         choose = np.random.choice(Nel, Nel)
         df_bs[ap_photo_sel_string] = dTs[choose]
@@ -80,3 +81,5 @@ class BS:
            'N_BOOTSTRAP_ITERATIONS': params["N_BOOTSTRAP_ITERATIONS"]})
             s.to_hdf(hdf_out_fname, 
                      key='s_additional')
+            df_curves = pd.DataFrame(curves)
+            df_curves.to_hdf(hdf_out_fname, key='bs_curves')
