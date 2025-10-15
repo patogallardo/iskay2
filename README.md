@@ -1,9 +1,9 @@
 # iskay2
 
 Installation:
-1. Install modified corrfunc
-2. clone this repo to your local system
-3. make folder iskay2/iskay2 discoverable in your pythonpath and your system should also be able to find executables in iskay2/misc
+1. Compile and Install modified corrfunc, see https://corrfunc.readthedocs.io/en/master/modules/custom_weighting.html. See directory: custom_weighting and use the source files to compile your local corrfunc.
+3. clone this repo to your local system
+4. make folder iskay2/iskay2 discoverable in your pythonpath and your system should also be able to find executables in iskay2/misc
 
 You can typically do this in a startup script with the following lines
 ```
