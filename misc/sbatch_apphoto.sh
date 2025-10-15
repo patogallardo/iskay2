@@ -5,7 +5,6 @@
 #SBATCH --job-name=ap_photo
 #SBATCH --output=mpi_output_%j.txt
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=pgallardo@uchicago.edu
  
 module load NiaEnv/2019b python/3.8.5
 source ~/.virtualenvs/env/bin/activate
